@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-import random
+
 
 pygame.init()
 # Starts up pygame
@@ -55,7 +55,6 @@ class Menu(Options):
     0 = Create A Deck; 1 = Play, 2 = Open Packs
     """
     def run_menu(self):
-        key_pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
             # Every time something happens
             if event.type == QUIT:
@@ -76,7 +75,6 @@ class Menu(Options):
                 self.running = False
                 return "board"
 
-
         screen.fill(Grey)
         # Make the screen grey
 
@@ -88,95 +86,35 @@ class Menu(Options):
         # Initialising the buttons then drawing them
 
         if self.current_selection is 0:
-            pygame.draw.circle(screen, Black, (int(round(play_button.x - 55)), int(round(display_height * 0.75 + 10))), 5, 5)
+            pygame.draw.circle(screen, Black, (int(round(play_button.x - 55)),
+                                               int(round(display_height * 0.75 + 10))), 5, 5)
         if self.current_selection is 1:
-            pygame.draw.circle(screen, Black, (int(round(custom_button.x - 160)), int(round(display_height * 0.75 + 10))), 5, 5)
+            pygame.draw.circle(screen, Black, (int(round(custom_button.x - 160)),
+                                               int(round(display_height * 0.75 + 10))), 5, 5)
 
         # Moving a dot to show the selected
 
         pygame.display.flip()
 
-class Tile:
 
-    def __init__(self, colour, row, column):
-        self.colour = colour
-        self.row = row
-        self.column = column
-
-    def draw_tile(self):
-        if self.colour is "light":\
-            pygame.draw.rect(screen, light_tile, ((self.row * 110), (self.column * 110), 110, 110))
-        elif self.colour is "dark":
-            pygame.draw.rect(screen, dark_tile, ((self.row * 110), (self.column * 110), 110, 110))
-        if self.colour is "h-light":\
-            pygame.draw.rect(screen, light_highlight, ((self.row * 110), (self.column * 110), 110, 110))
-        elif self.colour is "h-dark":
-            pygame.draw.rect(screen, dark_highlight, ((self.row * 110), (self.column * 110), 110, 110))
-
-
-class Board(Tile):
+class Board:
     def __init__(self):
-        Tile.__init__(self, colour="", row=-1, column=-1)
         self.running = True
 
-    def make_board(self):
+    @staticmethod
+    def make_board():
         board = []
         colour_change = 0
-        for i in range(8):
-            board_y = []
+        tile_num = -1
+        for rows in range(8):
+            board_columns = []
             colour_change = 1 - colour_change
-            for i in range(8):
-                board_y.append(colour_change)
+            for items in range(8):
+                tile_num += 1
+                board_columns.append(colour_change)
                 colour_change = 1 - colour_change
-            board.append(board_y)
+            board.append(board_columns)
         return board
-
-    def draw_board(self, board):
-        screen.fill(Grey)
-        tile_pos = -1
-        for row in board:
-            column_number = -1
-            tile_pos += 1
-            for tile in row:
-                column_number += 1
-                if tile == 0:
-                    new_tile = Tile("light", tile_pos, column_number)
-                    new_tile.draw_tile()
-                elif tile == 1:
-                    new_tile = Tile("dark", tile_pos, column_number)
-                    new_tile.draw_tile()
-        for event in pygame.event.get():
-            # Every time something happens
-            if event.type == QUIT:
-                self.running = False
-                return False
-
-        pygame.display.flip()
-
-    def highlight_tiles(self, board, row, column):
-        if board[row][column] is 0:
-            highlighted_tile = Tile("h-light", row, column)
-            highlighted_tile.draw_tile()
-        elif board[row][column] is 1:
-            highlighted_tile = Tile("h-dark", row, column)
-            highlighted_tile.draw_tile()
-
-"""
-What I want to do:
-    When a piece is clicked on, highlight the valid squares it can move to
-What's needed:
-    Piece position
-    Current state of the board (Where things literally are)
-    *Variating Factors (Check, En Passant, Castling)
-    How the piece can move
-Where to get these:
-    Piece class
-    play board list
-    a scary place
-    individual piece class
-Ignoring variation, it can be done at each level instead of one grouped function
-    Click on Piece
-    Function that takes movement as parameters?
 """
 class Piece:
     def __init__(self, colour, pos_x, pos_y):
@@ -196,22 +134,27 @@ class Pawn(Piece):
     def __init__(self):
         Piece.__init__(self, colour=self.colour, pos_x=self.pos_x, pos_y=self.pos_y)
         self.has_moved = False
+"""
 
 
-def create_board(inital_board):
-    counter = -1
-    for rows in inital_board:
-        counter += 1
-        y_counter = -1
-        for items in rows:
-            y_counter += 1
-            inital_board[counter][y_counter] = None
-    new_board = inital_board
-    return new_board
+def draw_board():
+    colour_flip = 0
+    size = 100
+    rect_pos_y = -size
+    for rows in range(8):
+        colour_flip = 1 - colour_flip
+        rect_pos_x = size
+        rect_pos_y += size
+        for tiles in range(8):
+            if colour_flip is 1:
+                pygame.draw.rect(screen, light_tile, (rect_pos_x, rect_pos_y, size, size))
+            if colour_flip is 0:
+                pygame.draw.rect(screen, dark_tile, (rect_pos_x, rect_pos_y, size, size))
+            rect_pos_x += 100
+            colour_flip = 1 - colour_flip
+    pygame.display.flip()
+    print("yo")
 
-board_setup = Board
-board_template = board_setup.make_board(board_setup)
-play_board = create_board(board_template)
 main_menu = Menu()
 menu_running = True
 board_running = False
@@ -227,14 +170,7 @@ while game_running:
             menu_running = False
             board_running = True
     elif board_running is True:
-        main_loop = board_setup.draw_board(board_setup, board_template)
-        if key_pressed[K_BACKQUOTE]:
-            board_setup.highlight_tiles(board_setup, board_template, 0, 0)
-            print(board_template)
-        if main_loop is False:
-            menu_running = False
-            game_running = False
-            break
+        draw_board()
 
 
 """
