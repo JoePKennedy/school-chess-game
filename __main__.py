@@ -1,12 +1,26 @@
 import pygame
 from pygame.locals import *
 
+black_pawn = pygame.image.load('assets/black_pawn.png')
+black_bishop = pygame.image.load('assets/black_bishop.png')
+black_rook = pygame.image.load('assets/black_rook.png')
+black_knight = pygame.image.load('assets/black_knight.png')
+black_king = pygame.image.load('assets/black_king.png')
+black_queen = pygame.image.load('assets/black_queen.png')
+white_pawn = pygame.image.load('assets/white_pawn.png')
+white_bishop = pygame.image.load('assets/white_bishop.png')
+white_rook = pygame.image.load('assets/white_rook.png')
+white_knight = pygame.image.load('assets/white_knight.png')
+white_king = pygame.image.load('assets/white_king.png')
+white_queen = pygame.image.load('assets/white_queen.png')
+
+
 
 pygame.init()
 # Starts up pygame
 
-display_width = 1600
-display_height = 900
+display_width = 1920
+display_height = 1080
 screen = pygame.display.set_mode((display_width, display_height))
 # Allows screen resolution to be changed, and sets the resolution
 
@@ -40,7 +54,7 @@ class Options:
 
     def draw(self):
         text = font.render(self.string, True, (0, 0, 0))
-        screen.blit(text, (self.x - text.get_width(), display_height * 0.75))
+        screen.blit(black_king, (self.x - text.get_width(), display_height * 0.75))
     # Draws the button
 
 
@@ -96,25 +110,18 @@ class Menu(Options):
 
         pygame.display.flip()
 
-
+"""
 class Board:
     def __init__(self):
         self.running = True
 
-    @staticmethod
-    def make_board():
-        board = []
-        colour_change = 0
-        tile_num = -1
-        for rows in range(8):
-            board_columns = []
-            colour_change = 1 - colour_change
-            for items in range(8):
-                tile_num += 1
-                board_columns.append(colour_change)
-                colour_change = 1 - colour_change
-            board.append(board_columns)
-        return board
+
+    def fill_board(board):
+        for piece in board:
+            if piece == "bp":
+"""
+
+
 """
 class Piece:
     def __init__(self, colour, pos_x, pos_y):
@@ -135,8 +142,37 @@ class Pawn(Piece):
         Piece.__init__(self, colour=self.colour, pos_x=self.pos_x, pos_y=self.pos_y)
         self.has_moved = False
 """
+class Board:
+    def __init__(self):
+        self.running = True
+    @staticmethod
+    def draw_board():
+        colour_flip = 0
+        size = 100
+        rect_pos_y = -size
+        for rows in range(8):
+            colour_flip = 1 - colour_flip
+            rect_pos_x = size
+            rect_pos_y += size
+            for tiles in range(8):
+                if colour_flip is 1:
+                    pygame.draw.rect(screen, light_tile, (rect_pos_x, rect_pos_y, size, size))
+                if colour_flip is 0:
+                    pygame.draw.rect(screen, dark_tile, (rect_pos_x, rect_pos_y, size, size))
+                rect_pos_x += 100
+                colour_flip = 1 - colour_flip
+        pygame.display.flip()
+
+    def run_board(self):
+        self.draw_board()
+        for event in pygame.event.get():
+            # Every time something happens
+            if event.type == QUIT:
+                self.running = False
+                return False
 
 
+"""
 def draw_board():
     colour_flip = 0
     size = 100
@@ -153,15 +189,18 @@ def draw_board():
             rect_pos_x += 100
             colour_flip = 1 - colour_flip
     pygame.display.flip()
-    print("yo")
+"""
 
 main_menu = Menu()
+main_board = Board()
 menu_running = True
 board_running = False
 while game_running:
     key_pressed = pygame.key.get_pressed()
     if menu_running is True:
         main_loop = main_menu.run_menu()
+        if key_pressed[K_BACKQUOTE]:
+            break
         if main_loop is False:
             menu_running = False
             game_running = False
@@ -170,7 +209,8 @@ while game_running:
             menu_running = False
             board_running = True
     elif board_running is True:
-        draw_board()
+        main_loop = main_board.run_board()
+
 
 
 """
