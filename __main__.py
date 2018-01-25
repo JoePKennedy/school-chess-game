@@ -19,8 +19,8 @@ white_queen = pygame.image.load('assets/white_queen.png')
 pygame.init()
 # Starts up pygame
 
-display_width = 1920
-display_height = 1080
+display_width = 1400
+display_height = 800
 screen = pygame.display.set_mode((display_width, display_height))
 # Allows screen resolution to be changed, and sets the resolution
 
@@ -54,25 +54,21 @@ class Options:
 
     def draw(self):
         text = font.render(self.string, True, (0, 0, 0))
-        screen.blit(black_king, (self.x - text.get_width(), display_height * 0.75))
+        screen.blit(text, (self.x - text.get_width(), display_height * 0.75))
     # Draws the button
 
 
 class Menu(Options):
     def __init__(self):
         Options.__init__(self, string="", width=0)
-        self.running = True
 
     current_selection = 0
-    """
-    Selection options
-    0 = Create A Deck; 1 = Play, 2 = Open Packs
-    """
+    # 0: Play game, 1: Customise Board
+
     def run_menu(self):
         for event in pygame.event.get():
             # Every time something happens
             if event.type == QUIT:
-                self.running = False
                 return False
                 # If that something is they want to quit, end the game
         if key_pressed[K_LEFT]:
@@ -86,7 +82,6 @@ class Menu(Options):
                 print(self.current_selection)
         if key_pressed[K_RETURN]:
             if self.current_selection is 0:
-                self.running = False
                 return "board"
 
         screen.fill(Grey)
@@ -142,11 +137,15 @@ class Pawn(Piece):
         Piece.__init__(self, colour=self.colour, pos_x=self.pos_x, pos_y=self.pos_y)
         self.has_moved = False
 """
+
+
 class Board:
-    def __init__(self):
-        self.running = True
+    def __init__(self, list):
+        self.list = list
+
     @staticmethod
     def draw_board():
+        screen.fill(Grey)
         colour_flip = 0
         size = 100
         rect_pos_y = -size
@@ -168,28 +167,20 @@ class Board:
         for event in pygame.event.get():
             # Every time something happens
             if event.type == QUIT:
-                self.running = False
                 return False
 
+    @staticmethod
+    def make_list():
+        piece_list = []
+        pieces = open("pieces.txt", "r")
+        for rows in pieces.readlines():
+            piece_list_rows = []
+            for item in rows:
+                piece_list_rows.append(item)
+            piece_list_rows = piece_list_rows[:-1]
+            piece_list.append(piece_list_rows)
+        print(piece_list)
 
-"""
-def draw_board():
-    colour_flip = 0
-    size = 100
-    rect_pos_y = -size
-    for rows in range(8):
-        colour_flip = 1 - colour_flip
-        rect_pos_x = size
-        rect_pos_y += size
-        for tiles in range(8):
-            if colour_flip is 1:
-                pygame.draw.rect(screen, light_tile, (rect_pos_x, rect_pos_y, size, size))
-            if colour_flip is 0:
-                pygame.draw.rect(screen, dark_tile, (rect_pos_x, rect_pos_y, size, size))
-            rect_pos_x += 100
-            colour_flip = 1 - colour_flip
-    pygame.display.flip()
-"""
 
 main_menu = Menu()
 main_board = Board()
@@ -210,6 +201,11 @@ while game_running:
             board_running = True
     elif board_running is True:
         main_loop = main_board.run_board()
+        if key_pressed[K_BACKQUOTE]:
+            main_board.make_list()
+        if main_loop is False:
+            board_running = False
+            game_running = False
 
 
 
