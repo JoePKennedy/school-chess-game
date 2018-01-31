@@ -15,12 +15,11 @@ white_king = pygame.image.load('assets/white_king.png')
 white_queen = pygame.image.load('assets/white_queen.png')
 
 
-
 pygame.init()
 # Starts up pygame
 
-display_width = 1400
-display_height = 800
+display_width = 1920
+display_height = 1080
 screen = pygame.display.set_mode((display_width, display_height))
 # Allows screen resolution to be changed, and sets the resolution
 
@@ -140,8 +139,8 @@ class Pawn(Piece):
 
 
 class Board:
-    def __init__(self, list):
-        self.list = list
+    def __init__(self, premade_list):
+        self.premade_list = premade_list
 
     @staticmethod
     def draw_board():
@@ -169,21 +168,25 @@ class Board:
             if event.type == QUIT:
                 return False
 
-    @staticmethod
-    def make_list():
+    def make_list(self):
         piece_list = []
         pieces = open("pieces.txt", "r")
         for rows in pieces.readlines():
             piece_list_rows = []
             for item in rows:
                 piece_list_rows.append(item)
-            piece_list_rows = piece_list_rows[:-1]
             piece_list.append(piece_list_rows)
-        print(piece_list)
+        self.premade_list = piece_list
+
+    def place_pieces(self):
+        current_piece = ""
+        for row in range(8):
+            for column in range(8):
+                current_piece = self.premade_list[row][column]
 
 
 main_menu = Menu()
-main_board = Board()
+main_board = Board(None)
 menu_running = True
 board_running = False
 while game_running:
@@ -206,7 +209,6 @@ while game_running:
         if main_loop is False:
             board_running = False
             game_running = False
-
 
 
 """
