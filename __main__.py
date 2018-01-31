@@ -14,12 +14,25 @@ white_knight = pygame.image.load('assets/white_knight.png')
 white_king = pygame.image.load('assets/white_king.png')
 white_queen = pygame.image.load('assets/white_queen.png')
 
+pieces = {"p":black_pawn,
+          "b":black_bishop,
+          "r":black_rook,
+          "n":black_knight,
+          "k":black_king,
+          "q":black_queen,
+          "P":white_pawn,
+          "B":white_bishop,
+          "R":white_rook,
+          "N":white_knight,
+          "K":white_king,
+          "Q":white_queen
+        }
 
 pygame.init()
 # Starts up pygame
 
-display_width = 1920
-display_height = 1080
+display_width = 800
+display_height = 800
 screen = pygame.display.set_mode((display_width, display_height))
 # Allows screen resolution to be changed, and sets the resolution
 
@@ -104,39 +117,6 @@ class Menu(Options):
 
         pygame.display.flip()
 
-"""
-class Board:
-    def __init__(self):
-        self.running = True
-
-
-    def fill_board(board):
-        for piece in board:
-            if piece == "bp":
-"""
-
-
-"""
-class Piece:
-    def __init__(self, colour, pos_x, pos_y):
-        self.colour = colour
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-
-    def piece_taken(self):
-        del self
-
-    def piece_moved(self, new_pos_x, new_pos_y):
-        self.pos_x = new_pos_x
-        self.pos_y = new_pos_y
-
-
-class Pawn(Piece):
-    def __init__(self):
-        Piece.__init__(self, colour=self.colour, pos_x=self.pos_x, pos_y=self.pos_y)
-        self.has_moved = False
-"""
-
 
 class Board:
     def __init__(self, premade_list):
@@ -150,7 +130,7 @@ class Board:
         rect_pos_y = -size
         for rows in range(8):
             colour_flip = 1 - colour_flip
-            rect_pos_x = size
+            rect_pos_x = size - size
             rect_pos_y += size
             for tiles in range(8):
                 if colour_flip is 1:
@@ -178,23 +158,61 @@ class Board:
             piece_list.append(piece_list_rows)
         self.premade_list = piece_list
 
-    def place_pieces(self):
-        current_piece = ""
-        for row in range(8):
-            for column in range(8):
-                current_piece = self.premade_list[row][column]
 
+class Piece:
+    def __init__(self, colour, pos, letter):
+        self.colour = colour
+        self.pos = pos
+        self.sprite = None
+        self.letter = letter
+
+    def piece_colour(self):
+        if self.letter.isupper() is True:
+            self.colour = "Black"
+        else:
+            self.colour = "White"
+
+    def set_piece(self):
+        if self.letter is "p":
+            self.sprite = white_pawn
+        if self.letter is "r":
+            self.sprite = white_rook
+        if self.letter is "n":
+            self.sprite = white_knight
+        if self.letter is "b":
+            self.sprite = white_bishop
+        if self.letter is "q":
+            self.sprite = white_queen
+        if self.letter is "k":
+            self.sprite = white_king
+        if self.letter is "P":
+            self.sprite = black_pawn
+        if self.letter is "R":
+            self.sprite = black_rook
+        if self.letter is "N":
+            self.sprite = black_knight
+        if self.letter is "B":
+            self.sprite = black_bishop
+        if self.letter is "Q":
+            self.sprite = black_queen
+        if self.letter is "K":
+            self.sprite = black_king
+
+    def display_piece(self):
+        screen.blit(self.sprite, self.pos)
+        pygame.display.flip()
 
 main_menu = Menu()
 main_board = Board(None)
 menu_running = True
 board_running = False
+arb_piece = Piece("white", (-14, -14))
 while game_running:
     key_pressed = pygame.key.get_pressed()
     if menu_running is True:
         main_loop = main_menu.run_menu()
         if key_pressed[K_BACKQUOTE]:
-            break
+            arb_piece.display_piece()
         if main_loop is False:
             menu_running = False
             game_running = False
@@ -205,20 +223,11 @@ while game_running:
     elif board_running is True:
         main_loop = main_board.run_board()
         if key_pressed[K_BACKQUOTE]:
-            main_board.make_list()
+            arb_piece.display_piece()
         if main_loop is False:
             board_running = False
             game_running = False
 
 
-"""
-test = Board
-new_board = test.make_board(test)
-menu_running = True
-while game_running:
-    main_loop = test.draw_board(test, new_board)
-    if main_loop is False:
-        break
-"""
 print("See ya")
 pygame.quit()
